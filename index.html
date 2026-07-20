@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#0B1322">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="TCB FotoGastos">
+<meta name="apple-mobile-web-app-title" content="FotoGastos Lite">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="styles.css">
@@ -86,7 +86,7 @@
             <button class="on" id="cam-auto-si">Iniciar al abrir</button>
             <button id="cam-auto-no">Solo al tocar</button>
           </div>
-          <div class="gem-note" style="margin:8px 0 14px"><b>¿iOS pide permiso de cámara en cada apertura?</b> Es una limitación conocida de Safari en apps instaladas a pantalla completa: iOS no recuerda ese permiso.<br><br><b>Solución sin bajar la seguridad:</b> abre <b>.../TCB-FotoGastos-Lite/navegador.html</b> en Safari → Compartir → Añadir a pantalla de inicio. Ese acceso abre la app dentro de Safari, donde el permiso <b>sí se recuerda por sitio</b>: botón <b>ᴀA</b> → Configuración del sitio web → Cámara → <b>Permitir</b> (solo para este sitio).<br><br><b>No actives</b> Ajustes de iOS → Safari → Cámara → Permitir: daría acceso a todas las webs.</div>
+          <div class="gem-note" style="margin:8px 0 14px"><b>¿iOS pide permiso de cámara en cada apertura?</b> Es una limitación conocida de Safari en apps instaladas a pantalla completa: iOS no recuerda ese permiso.<br><br><b>Solución sin bajar la seguridad:</b> abre <b>.../TCB-Gastos-Lite/navegador.html</b> en Safari → Compartir → Añadir a pantalla de inicio. Ese acceso abre la app dentro de Safari, donde el permiso <b>sí se recuerda por sitio</b>: botón <b>ᴀA</b> → Configuración del sitio web → Cámara → <b>Permitir</b> (solo para este sitio).<br><br><b>No actives</b> Ajustes de iOS → Safari → Cámara → Permitir: daría acceso a todas las webs.</div>
           <div class="eyebrow" style="margin-bottom:8px">Imagen — modo por defecto</div>
           <div class="filtros" id="filtros-def">
             <button class="filtro on" data-modo="color">Auto-color</button>
@@ -104,8 +104,7 @@
           <button class="btn btn-primary" id="btn-conectar" style="margin-top:12px">Conectar Google Drive</button>
           <div class="gem-note" id="drive-estado" style="margin-top:8px">No conectado.</div>
         </div>
-        <div class="card">
-          <button class="btn btn-ghost btn-sm" id="btn-otros" style="width:100%; margin:2px 0 10px; opacity:.75">Otros ajustes</button>
+        <button class="btn btn-ghost btn-sm" id="btn-otros" style="width:100%; margin:2px 0 10px; opacity:.75">Otros ajustes</button>
         <div class="card" id="otros-ajustes" hidden>
           <div class="eyebrow" style="margin-bottom:4px">Credenciales avanzadas</div>
           <div class="gem-note" style="margin:6px 0 8px">Estos valores vienen configurados con la app. Cámbialos solo si sabes lo que haces.</div>
@@ -114,7 +113,7 @@
         </div>
         <div style="text-align:center; padding:4px 0 2px">
           <span class="tcb-logo" style="width:72px;height:26px" role="img" aria-label="TCB"></span>
-          <div style="font-size:11px; color:var(--faint); margin-top:4px">TCB FotoGastos · © TCB — Tax Consulting Business</div>
+          <div style="font-size:11px; color:var(--faint); margin-top:4px">TCB FotoGastos Lite · © TCB — Tax Consulting Business</div>
         </div>
       </div>
     </section>

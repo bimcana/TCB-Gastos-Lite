@@ -42,12 +42,12 @@ tesseract/pdf-lib/sheetjs).
 
 ## 5. Publicación (pendiente al escribir esto)
 
-1. Crear repo vacío `ariesteban/TCB-FotoGastos-Lite` en github.com (dueño).
-2. `git remote add origin https://github.com/ariesteban/TCB-FotoGastos-Lite.git`
+1. Crear repo vacío `ariesteban/TCB-Gastos-Lite` en github.com (dueño).
+2. `git remote add origin https://github.com/ariesteban/TCB-Gastos-Lite.git`
    `git push -u origin main && git branch gh-pages main && git push origin gh-pages`
 3. Settings → Pages → Deploy from branch → `gh-pages` / root.
 4. Esperar UNA construcción; verificar:
-   `curl -s https://ariesteban.github.io/TCB-FotoGastos-Lite/sw.js | head -1` → `lite-v1`.
+   `curl -s https://ariesteban.github.io/TCB-Gastos-Lite/sw.js | head -1` → `lite-v1`.
 5. Prueba cruzada: subir una foto desde la Lite y verla «Pendiente de revisión» en la Full.
 
 ## 6. Pruebas
