@@ -114,18 +114,41 @@ async function reprocesarRealce(){
 const video = document.getElementById('cam-video');
 const statusTxt = document.getElementById('cam-status-txt');
 
-iniciarCamara(video)
-  .then(() => { statusTxt.textContent = 'Buscando documento…'; })
-  .catch(err => {
-    statusTxt.textContent = 'Sin acceso a la cámara';
-    toast('Permite el acceso a la cámara para capturar facturas');
-    console.error(err);
-  });
+// Ajuste "Cámara": con camaraAuto=false la cámara NO se enciende (ni dispara el aviso
+// de permiso de iOS) hasta que el usuario toque el estado en pantalla.
+function arrancarCamara(){
+  statusTxt.textContent = 'Iniciando cámara…';
+  iniciarCamara(video)
+    .then(() => { statusTxt.textContent = 'Buscando documento…'; })
+    .catch(err => {
+      statusTxt.textContent = 'Sin acceso a la cámara';
+      toast('Permite el acceso a la cámara para capturar facturas');
+      console.error(err);
+    });
+}
+if (get('camaraAuto', true)){
+  arrancarCamara();
+} else {
+  statusTxt.textContent = 'Toca aquí para activar la cámara';
+}
+document.getElementById('cam-status').addEventListener('click', () => {
+  const track = video.srcObject && video.srcObject.getVideoTracks()[0];
+  if (!track || track.readyState === 'ended') arrancarCamara();
+});
+
+function actualizarUICamaraAuto(){
+  const auto = get('camaraAuto', true);
+  document.getElementById('cam-auto-si').classList.toggle('on', auto);
+  document.getElementById('cam-auto-no').classList.toggle('on', !auto);
+}
+document.getElementById('cam-auto-si').addEventListener('click', () => { set('camaraAuto', true); actualizarUICamaraAuto(); });
+document.getElementById('cam-auto-no').addEventListener('click', () => { set('camaraAuto', false); actualizarUICamaraAuto(); toast('La cámara solo se encenderá cuando la toques'); });
+actualizarUICamaraAuto();
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   const track = video.srcObject && video.srcObject.getVideoTracks()[0];
-  if (!track || track.readyState === 'ended'){
+  if ((!track || track.readyState === 'ended') && get('camaraAuto', true)){
     iniciarCamara(video).catch(err => {
       statusTxt.textContent = 'Sin acceso a la cámara';
       console.error(err);
