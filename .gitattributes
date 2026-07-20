@@ -1,0 +1,3 @@
+vendor/opencv.js binary
+vendor/ort/** binary
+vendor/modelos/** binary
