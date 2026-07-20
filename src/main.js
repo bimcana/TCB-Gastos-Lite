@@ -552,6 +552,20 @@ async function reconectarSilencioso(){
 }
 window.addEventListener('load', () => setTimeout(reconectarSilencioso, 600));
 
+// El token de Google vive 60 min (limite fijo de Google para apps sin servidor). La
+// renovacion silenciosa al abrir FALLA en iOS si no hay gesto del usuario (bloqueo de
+// popups). Solucion: el PRIMER toque en cualquier parte renueva el token — como el
+// consentimiento ya existe, es instantaneo. Throttle de 30 s.
+let _ultimoIntentoRenovar = 0;
+document.addEventListener('pointerdown', () => {
+  if (conectado()) return;
+  if (!get('driveConectadoAntes', false) || !clientIdActivo() || !window.google) return;
+  const ahora = Date.now();
+  if (ahora - _ultimoIntentoRenovar < 30000) return;
+  _ultimoIntentoRenovar = ahora;
+  reconectarSilencioso();
+}, true);
+
 // ---------- Selector de carpeta matriz (vinculo por ID, incluye Compartidos) ----------
 let pickerPila = [];
 const PICKER_VIRTUALES = new Set(['root', '__compartidos__']);
