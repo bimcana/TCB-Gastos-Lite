@@ -1,7 +1,7 @@
-const VERSION = 'lite-v1';
+const VERSION = 'lite-v2';
 // Regla de mantenimiento: subir VERSION en cada despliegue.
 const PRECACHE = [
-  './', 'index.html', 'styles.css', 'manifest.webmanifest',
+  './', 'index.html', 'navegador.html', 'styles.css', 'manifest.webmanifest',
   'src/main.js', 'src/camera.js', 'src/detect.js', 'src/cvready.js', 'src/config.js',
   'src/process.js', 'src/enhance.js', 'src/naming.js', 'src/settings.js', 'src/drive.js',
   'src/queue.js', 'src/importar.js', 'src/esquinas.js', 'src/detectia.js', 'src/carga.js',
