@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1322">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TCB FotoGastos">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css">
+<title>TCB FotoGastos Lite</title>
+
+<div class="phone">
+  <div class="screens">
+
+    <section class="screen active" id="scr-camara">
+      <div class="viewport" id="viewport">
+        <video id="cam-video" playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>
+        <canvas id="cam-overlay" style="position:absolute;inset:0;width:100%;height:100%;z-index:4"></canvas>
+        <div class="month-pill"><b class="num" id="pill-total">—</b><span class="num" id="pill-mes"></span></div>
+        <div class="cam-status" id="cam-status"><span class="pulse"></span><span id="cam-status-txt">Iniciando cámara…</span></div>
+        <div class="flashfx" id="flashfx"></div>
+      </div>
+      <div class="cam-controls">
+        <button class="cam-side" id="btn-importar" aria-label="Importar de la galería">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.6" cy="10" r="1.5"/><path d="m5 17 4.5-4.5 3 3L16 12l3.5 3.5"/></svg>
+        </button>
+        <input type="file" id="file-import" accept="image/*" multiple hidden>
+        <button class="shutter" id="shutter" aria-label="Capturar">
+          <svg class="ring" width="76" height="76" viewBox="0 0 76 76"><circle class="track" cx="38" cy="38" r="34"/><circle class="prog" cx="38" cy="38" r="34"/></svg>
+          <span class="core"></span>
+        </button>
+        <button class="cam-side" id="btn-cola" aria-label="Cola de subida">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 16V4m0 0 4 4m-4-4L8 8"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <span class="badge" id="cola-badge" style="display:none">0</span>
+        </button>
+      </div>
+      <div class="cam-note"><b>Disparo automático activado</b> — encuadra la factura y mantén firme</div>
+    </section>
+
+    <section class="screen" id="scr-revision">
+      <div class="head">
+        <button class="back" onclick="cancelarLoteYVolver()" aria-label="Volver">‹</button>
+        <div><h2>Revisar factura</h2><div class="hsub num" id="rev-file">—</div></div>
+      </div>
+      <div class="scroll">
+        <div class="lote-bar" id="lote-bar" hidden>
+          <b class="num" id="lote-txt"></b>
+          <div class="lote-dots" id="lote-dots"></div>
+        </div>
+        <div class="filtros" role="tablist" id="filtros">
+          <button class="filtro on" data-modo="color">Auto-color</button>
+          <button class="filtro" data-modo="byn">Blanco y negro</button>
+          <button class="filtro" data-modo="grises">Grises</button>
+          <button class="filtro" data-modo="original">Original</button>
+        </div>
+        <div class="seg" role="tablist">
+          <button class="on" id="seg-proc">Procesada · se guarda así</button>
+          <button id="seg-orig">Original de cámara</button>
+        </div>
+        <div class="stage" id="stage" style="min-height:340px">
+          <div id="rev-wrap" style="position:relative; display:grid; max-width:100%">
+            <canvas id="rev-canvas" title="Toca para ver en pantalla completa" style="max-width:100%; max-height:66vh; border-radius:4px; box-shadow:0 10px 26px rgba(0,0,0,.45); cursor:zoom-in"></canvas>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btn-esquinas" style="width:100%">Ajustar esquinas manualmente</button>
+        <div class="gem-note" style="margin:4px 0 8px">La foto sube tal como se ve. Quien tenga la versión completa le leerá los datos.</div>
+        <button class="btn btn-primary" id="confirm-btn">Subir a Drive</button>
+      </div>
+    </section>
+
+    <section class="screen" id="scr-ajustes">
+      <div class="head" style="padding-top:12px"><div><h2>Ajustes</h2><div class="hsub">Tema, nube y captura</div></div></div>
+      <div class="scroll">
+        <div class="card">
+          <div class="eyebrow" style="margin-bottom:8px">Tema de interfaz</div>
+          <div class="seg" role="tablist">
+            <button class="on" id="theme-dark">Oscuro · TCB Glass</button>
+            <button id="theme-light">Claro · estilo iOS</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="eyebrow" style="margin-bottom:8px">Imagen — modo por defecto</div>
+          <div class="filtros" id="filtros-def">
+            <button class="filtro on" data-modo="color">Auto-color</button>
+            <button class="filtro" data-modo="byn">Blanco y negro</button>
+            <button class="filtro" data-modo="grises">Grises</button>
+            <button class="filtro" data-modo="original">Original</button>
+          </div>
+          <div class="gem-note" style="margin-top:8px">Se aplica a cada factura nueva. Puedes cambiarlo por factura en la pantalla de revisión.</div>
+        </div>
+        <div class="card">
+          <div class="eyebrow" style="margin-bottom:4px">Google Drive</div>
+          <label class="eyebrow" style="display:block; margin-top:10px">Carpeta de gastos vinculada</label>
+          <div class="gem-note num" id="carpeta-ruta" style="margin-top:4px">— sin vincular —</div>
+          <button class="btn btn-ghost btn-sm" id="btn-carpeta" style="margin-top:8px; width:100%">Elegir carpeta…</button>
+          <button class="btn btn-primary" id="btn-conectar" style="margin-top:12px">Conectar Google Drive</button>
+          <div class="gem-note" id="drive-estado" style="margin-top:8px">No conectado.</div>
+        </div>
+        <div class="card">
+          <button class="btn btn-ghost btn-sm" id="btn-otros" style="width:100%; margin:2px 0 10px; opacity:.75">Otros ajustes</button>
+        <div class="card" id="otros-ajustes" hidden>
+          <div class="eyebrow" style="margin-bottom:4px">Credenciales avanzadas</div>
+          <div class="gem-note" style="margin:6px 0 8px">Estos valores vienen configurados con la app. Cámbialos solo si sabes lo que haces.</div>
+          <label class="eyebrow" for="inp-clientid" style="display:block; margin-top:10px">Client ID de Google (identifica a la app, no a tu cuenta)</label>
+          <input class="keyfield" id="inp-clientid" placeholder="xxxxxxx.apps.googleusercontent.com">
+        </div>
+        <div style="text-align:center; padding:4px 0 2px">
+          <span class="tcb-logo" style="width:72px;height:26px" role="img" aria-label="TCB"></span>
+          <div style="font-size:11px; color:var(--faint); margin-top:4px">TCB FotoGastos · © TCB — Tax Consulting Business</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="revisar-panel" id="carpeta-panel" hidden>
+    <div class="revisar-card">
+      <div class="revisar-head">
+        <b>Elegir carpeta de gastos</b>
+        <button class="revisar-x" id="carpeta-cerrar" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="gem-note num" id="carpeta-ruta-actual" style="margin-bottom:6px"></div>
+      <div id="carpeta-lista" style="max-height:45vh; overflow:auto"></div>
+      <div style="display:flex; gap:8px; margin-top:12px">
+        <button class="btn btn-ghost btn-sm" id="carpeta-nueva" style="flex:1">Nueva carpeta</button>
+        <button class="btn btn-primary btn-sm" id="carpeta-usar" style="flex:1">Usar esta carpeta</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="revisar-panel" id="cola-panel" hidden>
+    <div class="revisar-card">
+      <div class="revisar-head">
+        <b>Cola de subida</b>
+        <button class="revisar-x" id="cola-cerrar" aria-label="Cerrar">✕</button>
+      </div>
+      <div id="cola-lista"></div>
+      <button class="btn btn-primary btn-sm" id="cola-subir" style="width:100%; margin-top:12px">Subir ahora</button>
+    </div>
+  </div>
+
+  <div class="esq-editor" id="esq-editor" hidden>
+    <div class="esq-stage"><canvas id="esq-canvas"></canvas></div>
+    <canvas class="esq-lupa" id="esq-lupa" width="132" height="132" hidden></canvas>
+    <div class="esq-acciones">
+      <button class="btn btn-ghost" id="esq-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="esq-aplicar">Aplicar</button>
+    </div>
+  </div>
+
+  <div class="visor" id="visor" hidden>
+    <button class="visor-cerrar" id="visor-cerrar" aria-label="Cerrar pantalla completa">✕</button>
+    <button class="visor-cerrar visor-recortar" id="visor-recortar" aria-label="Ajustar esquinas" hidden>✂</button>
+    <img id="visor-img" alt="Factura escaneada a pantalla completa">
+  </div>
+
+  <div class="overlay-proc" id="overlay-proc" aria-live="polite" hidden>
+    <div class="spinner" role="status"></div>
+    <div class="proc-txt">Procesando…</div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <nav class="tabbar">
+    <button class="tab on" id="tab-camara" onclick="show('camara')"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8h2l2-3h8l2 3h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.4"/></svg>Cámara</button>
+    
+    <button class="tab" id="tab-ajustes" onclick="show('ajustes')"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.06-.4.1-.8.1-1.2z"/></svg>Ajustes</button>
+  </nav>
+</div>
+
+<script src="vendor/opencv.js" async></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script type="module" src="src/main.js"></script>
+<script>
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</html>
