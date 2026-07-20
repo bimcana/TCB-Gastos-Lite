@@ -1,8 +1,8 @@
 # TCB FotoGastos **Lite**
 
-Versión **alimentadora** de [TCB FotoGastos](https://github.com/ariesteban/TCB-FotoGastos): para que empleados o colaboradores fotografíen facturas NCF, las recorten y las suban a la carpeta de gastos de la empresa en Google Drive — **sin** ver los gastos, **sin** lectura de datos y **sin** generación de documentos. Cada foto sube como `Pendiente_…` y aparece en la versión completa como **«Pendiente de revisión»**, lista para que su dueño le lea los datos con IA y la valide.
+Versión **alimentadora** de [TCB FotoGastos](https://github.com/bimcana/TCB-FotoGastos): para que empleados o colaboradores fotografíen facturas NCF, las recorten y las suban a la carpeta de gastos de la empresa en Google Drive — **sin** ver los gastos, **sin** lectura de datos y **sin** generación de documentos. Cada foto sube como `Pendiente_…` y aparece en la versión completa como **«Pendiente de revisión»**, lista para que su dueño le lea los datos con IA y la valide.
 
-**App en vivo:** https://ariesteban.github.io/TCB-Gastos-Lite/
+**App en vivo:** https://bimcana.github.io/TCB-Gastos-Lite/
 
 En iPhone: abrir en Safari → Compartir → **Añadir a pantalla de inicio**.
 

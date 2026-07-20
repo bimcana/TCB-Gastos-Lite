@@ -33,7 +33,7 @@ tesseract/pdf-lib/sheetjs).
 ## 4. Reglas propias
 
 1. Subir `VERSION` de `sw.js` en cada despliegue (`lite-vN`).
-2. Mismo Client ID que la Full (`config.js`) y mismo origen `ariesteban.github.io` →
+2. Mismo Client ID que la Full (`config.js`) y mismo origen `bimcana.github.io` →
    **nada que configurar en Google** al publicar o mover de repo bajo ese origen.
 3. Ajustes tiene: tema, Cámara (toggle «Iniciar al abrir / Solo al tocar», clave
    `tcb:camaraAuto`), Drive (Conectar + Elegir carpeta…), «Otros ajustes» con PIN (solo
@@ -42,12 +42,12 @@ tesseract/pdf-lib/sheetjs).
 
 ## 5. Publicación (pendiente al escribir esto)
 
-1. Crear repo vacío `ariesteban/TCB-Gastos-Lite` en github.com (dueño).
-2. `git remote add origin https://github.com/ariesteban/TCB-Gastos-Lite.git`
+1. Crear repo vacío `bimcana/TCB-Gastos-Lite` en github.com (dueño).
+2. `git remote add origin https://github.com/bimcana/TCB-Gastos-Lite.git`
    `git push -u origin main && git branch gh-pages main && git push origin gh-pages`
 3. Settings → Pages → Deploy from branch → `gh-pages` / root.
 4. Esperar UNA construcción; verificar:
-   `curl -s https://ariesteban.github.io/TCB-Gastos-Lite/sw.js | head -1` → `lite-v1`.
+   `curl -s https://bimcana.github.io/TCB-Gastos-Lite/sw.js | head -1` → `lite-v1`.
 5. Prueba cruzada: subir una foto desde la Lite y verla «Pendiente de revisión» en la Full.
 
 ## 6. Pruebas

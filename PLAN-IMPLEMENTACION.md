@@ -12,14 +12,14 @@
 
 ## Global Constraints
 
-- Carpeta del proyecto: `TCB-FotoScan/TCB-FotoGastos-Lite/` (esta). Repo GitHub propio: `ariesteban/TCB-FotoGastos-Lite`.
+- Carpeta del proyecto: `TCB-FotoScan/TCB-FotoGastos-Lite/` (esta). Repo GitHub propio: `bimcana/TCB-FotoGastos-Lite`.
 - Commits en español con `git commit -F archivo` (evita problemas de tildes en el shell). Sin datos de BIMCANA en el repo público (ejemplos: CLIENTE SRL, RNC 000-0000-00).
 - **`.nojekyll` va en el PRIMER commit** (lección aprendida: sin él, Pages procesa 30 MB con Jekyll y las publicaciones tardan horas o se atascan).
 - **Un push por publicación**: nunca encadenar pushes sin esperar a que la construcción de Pages termine (los pushes nuevos CANCELAN la construcción en curso — así se congeló la Full 3 días).
 - Nombres de subida: `Pendiente_AAAAMMDD-HHMMSS.jpg` (formato exacto de la Full — su revisor los renombra a `Compra_DDN.jpg` al leer la fecha).
 - `description` de cada subida: JSON `{"v":1,"archivo":"<nombre>","estado":"pendiente","origen":"lite","subidoEn":"<ISO>"}` — compatible con `entradaDeDesc` de la Full (exige `v===1` y `archivo`).
 - Tests con `node --test tests/*.test.js`; verdes antes de cada commit.
-- Client ID: el MISMO de la Full (`src/config.js` se copia tal cual). GitHub Pages sirve todos los repos del usuario bajo el MISMO origen `https://ariesteban.github.io` → **no hay que tocar nada en Google Cloud** (origen ya autorizado, scope ya consentido, app OAuth ya publicada).
+- Client ID: el MISMO de la Full (`src/config.js` se copia tal cual). GitHub Pages sirve todos los repos del usuario bajo el MISMO origen `https://bimcana.github.io` → **no hay que tocar nada en Google Cloud** (origen ya autorizado, scope ya consentido, app OAuth ya publicada).
 
 ## Mapa de archivos
 
@@ -227,7 +227,7 @@ Regla de mantenimiento (heredada): **subir `VERSION` en cada despliegue**.
 - [ ] **Step 1:** Crear el repo (con `gh` si está instalado, si no: github.com → New repository → `TCB-FotoGastos-Lite`, público, vacío):
 
 ```bash
-git remote add origin https://github.com/ariesteban/TCB-FotoGastos-Lite.git
+git remote add origin https://github.com/bimcana/TCB-FotoGastos-Lite.git
 git push -u origin main
 git branch gh-pages main && git push origin gh-pages
 ```
@@ -236,14 +236,14 @@ git branch gh-pages main && git push origin gh-pages
 - [ ] **Step 3:** Esperar UNA construcción (Actions → «pages build and deployment»). **No empujar nada más mientras corre.** Verificar:
 
 ```bash
-curl -s https://ariesteban.github.io/TCB-FotoGastos-Lite/sw.js | head -1   # → const VERSION = 'lite-v1';
+curl -s https://bimcana.github.io/TCB-FotoGastos-Lite/sw.js | head -1   # → const VERSION = 'lite-v1';
 ```
 
-- [ ] **Step 4:** Abrir `https://ariesteban.github.io/TCB-FotoGastos-Lite/` y verificar carga sin errores de consola.
+- [ ] **Step 4:** Abrir `https://bimcana.github.io/TCB-FotoGastos-Lite/` y verificar carga sin errores de consola.
 
 ### Task 6: Publicación — Google (verificación de que NO hay nada que hacer)
 
-- [ ] **Step 1:** Confirmar que el origen del sitio Lite es el MISMO que el de la Full: ambos son `https://ariesteban.github.io` (los repos son rutas, no orígenes). Como ese origen ya está en «Orígenes autorizados de JavaScript» del Client ID compartido, y la app OAuth ya está publicada («In production»), **la Lite no requiere ningún cambio en Google Cloud**. Si algún día la Lite se sirviera desde OTRO dominio (p. ej. dominio propio), habría que añadir ese origen al Client ID — anotarlo en el README.
+- [ ] **Step 1:** Confirmar que el origen del sitio Lite es el MISMO que el de la Full: ambos son `https://bimcana.github.io` (los repos son rutas, no orígenes). Como ese origen ya está en «Orígenes autorizados de JavaScript» del Client ID compartido, y la app OAuth ya está publicada («In production»), **la Lite no requiere ningún cambio en Google Cloud**. Si algún día la Lite se sirviera desde OTRO dominio (p. ej. dominio propio), habría que añadir ese origen al Client ID — anotarlo en el README.
 - [ ] **Step 2:** Prueba real: en el navegador, Ajustes → Conectar Google Drive → consentir → **Elegir carpeta…** → navegar a una carpeta compartida o a `Gastos_NCF` → vincular → subir una foto de prueba → confirmarla en Drive con nombre `Pendiente_…` y verificar en la app FULL que aparece como **«Pendiente de revisión»** (la conciliación la restaura del `description`).
 
 ### Task 7: Prueba de campo (dueño)
