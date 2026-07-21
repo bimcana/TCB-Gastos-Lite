@@ -1,4 +1,4 @@
-const VERSION = 'lite-v5';
+const VERSION = 'lite-v6';
 // Regla de mantenimiento: subir VERSION en cada despliegue.
 const PRECACHE = [
   './', 'index.html', 'navegador.html', 'styles.css', 'manifest.webmanifest',

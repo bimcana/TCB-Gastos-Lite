@@ -37,7 +37,7 @@ import { iniciarCamara, capturarFrame } from './camera.js';
 import { procesar, aplicarRealce, canvasAJpeg } from './process.js';
 import { get, set } from './settings.js';
 import { cvReady } from './cvready.js';
-import { detectarDocumento, esEstable, nitidezRegion, tocaBorde } from './detect.js';
+import { detectarDocumento, esEstable, nitidezRegion, tocaBorde, recorteConfiable } from './detect.js';
 import { archivoACanvas } from './importar.js';
 import { abrirEditorEsquinas, initEditorEsquinas } from './esquinas.js';
 import { detectarConIA } from './detectia.js';
@@ -266,6 +266,9 @@ function dibujarOverlay(esquinas){
 
 const UMBRAL_NITIDEZ = 120;
 const FRAMES_ESTABLES = 4;
+// Fase 9: tolerancia al temblor natural de la mano (2% del ancho); la nitidez dentro
+// del papel sigue siendo la guarda anti-foto-movida.
+const TOL_ESTABLE = 0.02;
 let estables = 0, disparando = false;
 
 async function buclDeteccion(){
@@ -279,7 +282,7 @@ async function buclDeteccion(){
       if (esquinas && tocaBorde(esquinas, frame.width, frame.height)) esquinas = null;
       dibujarOverlay(esquinas);
       const shutter = document.getElementById('shutter');
-      if (esquinas && esEstable(ultimasEsquinas, esquinas, frame.width * 0.01)){
+      if (esquinas && esEstable(ultimasEsquinas, esquinas, frame.width * TOL_ESTABLE)){
         estables++;
         statusTxt.textContent = 'Documento detectado — mantén firme';
         document.getElementById('cam-status').classList.add('lock');
@@ -294,7 +297,8 @@ async function buclDeteccion(){
           setTimeout(() => { procesarYRevisar(); disparando = false; }, 350);
         }
       } else {
-        estables = 0;
+        // Temblor breve con documento aun detectado: degrada el conteo, no lo reinicia.
+        estables = esquinas ? Math.max(0, estables - 1) : 0;
         shutter.classList.remove('arm');
         statusTxt.textContent = esquinas ? 'Documento detectado — mantén firme' : 'Buscando documento…';
         document.getElementById('cam-status').classList.toggle('lock', !!esquinas);
@@ -332,7 +336,11 @@ async function cargarSiguienteDelLote(){
     const canvas = await archivoACanvas(lote.files[lote.i]);
     let esquinas = detectarDocumento(canvas, 1200);
     if (!esquinas) esquinas = await detectarConIAConOverlay(canvas);
-    esquinas = await abrirEditorEsquinas(canvas, esquinas); // siempre confirmar el recorte
+    // Fase 9: cuadrilatero confiable = recorte automatico sin editor (estilo Adobe);
+    // el editor solo abre para detecciones dudosas o fallidas (✂ en Revision re-ajusta).
+    if (!recorteConfiable(esquinas, canvas.width, canvas.height)){
+      esquinas = await abrirEditorEsquinas(canvas, esquinas);
+    }
     window.__captura = { canvas, esquinas };
     procesarYRevisar();
   } catch(e){
