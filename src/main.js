@@ -37,8 +37,9 @@ import { iniciarCamara, capturarFrame } from './camera.js';
 import { procesar, aplicarRealce, canvasAJpeg } from './process.js';
 import { get, set } from './settings.js';
 import { cvReady } from './cvready.js';
-import { detectarDocumento, esEstable, nitidezRegion, tocaBorde, recorteConfiable,
-         rectanguloDePapel, bandaDePapel, fraccionClara } from './detect.js';
+import { detectarDocumento, esEstable, nitidezRegion, recorteConfiable,
+         rectanguloDePapel, bandaDePapel, fraccionClara,
+         papelLlenaLaFoto, marcoCompleto, esCasiElEncuadre } from './detect.js';
 import { archivoACanvas } from './importar.js';
 import { abrirEditorEsquinas, initEditorEsquinas } from './esquinas.js';
 import { detectarConIA } from './detectia.js';
@@ -283,8 +284,11 @@ async function buclDeteccion(){
     if (video.videoWidth && document.getElementById('scr-camara').classList.contains('active') && !disparando){
       frame.width = video.videoWidth; frame.height = video.videoHeight;
       frame.getContext('2d').drawImage(video, 0, 0);
-      let esquinas = detectarDocumento(frame, 700, { rescate: false });
-      if (esquinas && tocaBorde(esquinas, frame.width, frame.height)) esquinas = null;
+      // Fase 11 (calibrado con 61 fotos reales — vivo detectaba 2/61): rescate hull
+      // habilitado (su solidez >=0.8 filtra texturas) y el veto es "abarca casi todo
+      // el encuadre", no "toca borde" (mataba tickets largos legitimos).
+      let esquinas = detectarDocumento(frame, 700);
+      if (esquinas && esCasiElEncuadre(esquinas, frame.width, frame.height)) esquinas = null;
       dibujarOverlay(esquinas);
       const shutter = document.getElementById('shutter');
       if (esquinas && esEstable(ultimasEsquinas, esquinas, frame.width * TOL_ESTABLE)){
@@ -339,6 +343,11 @@ async function recortarImportada(canvas){
                   && fraccionClara(canvas, e) >= MIN_CLARO;
   const clasico = detectarDocumento(canvas, 1200);
   if (ok(clasico)) return clasico;
+  // Patron A (Fase 11): el papel llena la foto — el recorte correcto es el marco completo.
+  if (papelLlenaLaFoto(canvas)){
+    const marco = marcoCompleto(canvas.width, canvas.height);
+    if (ok(marco)) return marco;
+  }
   const rect = await conOverlay(() => rectanguloDePapel(canvas, 1200));
   if (ok(rect)) return rect;
   const ia = await detectarConIAConOverlay(canvas);

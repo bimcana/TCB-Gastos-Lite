@@ -29,7 +29,12 @@ config, drive`. Fase 9 (portada 2026-07-21): cámara con enfoque continuo best-e
 tolerancia al temblor (`TOL_ESTABLE=0.02` + degradación del conteo `estables`).
 **Fase 10 (portada 2026-07-21)**: `recortarImportada` con la misma cascada de la Full —
 `detectarDocumento` → `rectanguloDePapel` (minAreaRect) → IA → `bandaDePapel` (laterales
-prolongados al marco de la foto) → editor. Se acepta el primero que pase forma
+prolongados al marco de la foto) → editor.
+**Fase 11 (portada 2026-07-21)**: detección recalibrada con las 61 fotos reales (vivo
+2→35/61, importación auto 31→44/61, cero regresiones): candidatos por contorno
+(approx→minAreaRect→hull) validados uno a uno, rescate hull también en vivo, veto
+`esCasiElEncuadre` en lugar de `tocaBorde`, y `papelLlenaLaFoto`→`marcoCompleto` en la
+cascada de importación. Ver reglas y límites en el doc de la Full (§4.8). Se acepta el primero que pase forma
 (`recorteConfiable`) **y contenido** (`fraccionClara ≥ 0.75`); esta última es la que
 evita aplicar un recorte torcido con fondo dentro. No aplica de la Fase 10: estado
 `validadaPorUsuario` ni botón Reconectar (la Lite no tiene Gastos). Propios de la Lite: `main.js` (orquestación reducida; la subida es
