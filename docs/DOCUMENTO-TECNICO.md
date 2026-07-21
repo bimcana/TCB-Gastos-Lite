@@ -32,6 +32,15 @@ tesseract/pdf-lib/sheetjs).
 
 ## 4. Reglas propias
 
+0. **Token de Drive (Fase 8)**: el token implícito vive 60 min fijos (límite de Google sin
+   backend). El listener global de `pointerdown` (capture, throttle 30 s) renueva cuando NO
+   hay conexión **y también de forma proactiva cuando al token le quedan <5 min**
+   (`porExpirar` en drive.js); estando aún conectado refresca SOLO el token
+   (`conectar({silencioso:true})`), sin re-ejecutar `postConexion`. **No quitar ese
+   listener.** En la Lite importa más que en la Full: aquí no hay pestaña de Gastos donde
+   avisar, y una subida con token vencido manda la foto a la cola en vez de a Drive. Por
+   decisión de Ari **la Lite NO lleva botón «Reconectar a Drive»** (ese botón vive en el
+   encabezado de Gastos de la Full); aquí el aviso es el texto `drive-estado` de Ajustes.
 1. Subir `VERSION` de `sw.js` en cada despliegue (`lite-vN`).
 2. Mismo Client ID que la Full (`config.js`) y mismo origen `bimcana.github.io` →
    **nada que configurar en Google** al publicar o mover de repo bajo ese origen.
@@ -52,7 +61,8 @@ tesseract/pdf-lib/sheetjs).
 
 ## 6. Pruebas
 
-`npm test` (tests puros copiados: naming, detect, settings, enhance). E2E en navegador:
+`npm test` (tests puros copiados: naming, detect, settings, enhance, **esquinas** — este
+último cubre los handles laterales de Fase 8: `puntosMedios`/`desplazarLado`). E2E en navegador:
 mismo procedimiento que la Full (puerto nuevo si el SW molesta; shim de rAF en el Browser
 pane del agente). Flujo mínimo: importar 2 fotos de `../Facturas de prueba/` → editor →
 subir sin conexión → cola con badge → panel de cola.

@@ -44,7 +44,7 @@ import { detectarConIA } from './detectia.js';
 import { nombreCarpetaMes, hoyISO, nombreProvisional, nombreUnico } from './naming.js';
 import { encolar, pendientes, eliminar, cuenta } from './queue.js';
 import { initAuth, conectar, conectado, asegurarCarpeta, listarNombres, subirJPEG, nombreDe,
-         alDesconectar, listarCarpetas, carpetasCompartidas, crearCarpeta } from './drive.js';
+         alDesconectar, listarCarpetas, carpetasCompartidas, crearCarpeta, porExpirar } from './drive.js';
 import { CLIENT_ID_APP } from './config.js';
 
 initEditorEsquinas();
@@ -556,14 +556,27 @@ window.addEventListener('load', () => setTimeout(reconectarSilencioso, 600));
 // renovacion silenciosa al abrir FALLA en iOS si no hay gesto del usuario (bloqueo de
 // popups). Solucion: el PRIMER toque en cualquier parte renueva el token — como el
 // consentimiento ya existe, es instantaneo. Throttle de 30 s.
+// Fase 8: ademas renueva PROACTIVAMENTE cuando al token le quedan <5 min, para que la
+// app casi nunca llegue a estar desconectada mientras se usa. En la Lite esto importa
+// mas que en la Full: aqui no hay pestaña de Gastos con aviso, y una subida que falla
+// por token vencido manda la foto a la cola en vez de a Drive.
 let _ultimoIntentoRenovar = 0;
 document.addEventListener('pointerdown', () => {
-  if (conectado()) return;
+  const porRenovar = !conectado() || porExpirar();
+  if (!porRenovar) return;
   if (!get('driveConectadoAntes', false) || !clientIdActivo() || !window.google) return;
   const ahora = Date.now();
   if (ahora - _ultimoIntentoRenovar < 30000) return;
   _ultimoIntentoRenovar = ahora;
-  reconectarSilencioso();
+  if (conectado()){
+    // Aun conectado: refrescar SOLO el token en silencio, sin re-inicializar la UI.
+    try {
+      initAuth(clientIdActivo());
+      conectar({ silencioso: true }).catch(e => console.warn('Renovacion anticipada fallo:', e.message));
+    } catch(e){ console.warn(e); }
+  } else {
+    reconectarSilencioso();
+  }
 }, true);
 
 // ---------- Selector de carpeta matriz (vinculo por ID, incluye Compartidos) ----------
