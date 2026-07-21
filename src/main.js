@@ -37,7 +37,8 @@ import { iniciarCamara, capturarFrame } from './camera.js';
 import { procesar, aplicarRealce, canvasAJpeg } from './process.js';
 import { get, set } from './settings.js';
 import { cvReady } from './cvready.js';
-import { detectarDocumento, esEstable, nitidezRegion, tocaBorde, recorteConfiable } from './detect.js';
+import { detectarDocumento, esEstable, nitidezRegion, tocaBorde, recorteConfiable,
+         rectanguloDePapel, bandaDePapel, fraccionClara } from './detect.js';
 import { archivoACanvas } from './importar.js';
 import { abrirEditorEsquinas, initEditorEsquinas } from './esquinas.js';
 import { detectarConIA } from './detectia.js';
@@ -206,7 +207,11 @@ document.getElementById('shutter').addEventListener('click', async () => {
   const canvas = capturarFrame(video);
   const fx = document.getElementById('flashfx');
   fx.classList.remove('go'); void fx.offsetWidth; fx.classList.add('go');
-  let esquinas = ultimasEsquinas || detectarDocumento(canvas, 1200) || await detectarConIAConOverlay(canvas);
+  // Fase 10: el rectangulo minimo entra antes que la IA (una factura ES un rectangulo).
+  let esquinas = ultimasEsquinas
+    || detectarDocumento(canvas, 1200)
+    || await conOverlay(() => rectanguloDePapel(canvas, 1200))
+    || await detectarConIAConOverlay(canvas);
   window.__captura = { canvas, esquinas };
   procesarYRevisar();
 });
@@ -322,6 +327,27 @@ function actualizarBarraLote(){
     .map((_, k) => `<span class="d ${k < i ? 'hecha' : k === i ? 'actual' : ''}"></span>`).join('');
 }
 
+// Recorte de una imagen IMPORTADA (Fase 10, mismo criterio que la Full tras el fallo de
+// campo del ticket largo sobre granito). Cascada del motor mas preciso al mas tolerante;
+// se acepta el primero que convenza por FORMA (recorteConfiable) y por CONTENIDO
+// (fraccionClara: casi todo papel dentro). Si ninguno convence, abre el editor — nunca
+// se aplica a ciegas un recorte torcido.
+const MIN_CLARO = 0.75;
+
+async function recortarImportada(canvas){
+  const ok = e => recorteConfiable(e, canvas.width, canvas.height)
+                  && fraccionClara(canvas, e) >= MIN_CLARO;
+  const clasico = detectarDocumento(canvas, 1200);
+  if (ok(clasico)) return clasico;
+  const rect = await conOverlay(() => rectanguloDePapel(canvas, 1200));
+  if (ok(rect)) return rect;
+  const ia = await detectarConIAConOverlay(canvas);
+  if (ok(ia)) return ia;
+  const banda = await conOverlay(() => bandaDePapel(canvas, 1200));
+  if (ok(banda)) return banda;
+  return abrirEditorEsquinas(canvas, clasico || rect || ia || banda);
+}
+
 async function cargarSiguienteDelLote(){
   const lote = window.__lote;
   if (!lote) return;
@@ -334,13 +360,7 @@ async function cargarSiguienteDelLote(){
   actualizarBarraLote();
   try {
     const canvas = await archivoACanvas(lote.files[lote.i]);
-    let esquinas = detectarDocumento(canvas, 1200);
-    if (!esquinas) esquinas = await detectarConIAConOverlay(canvas);
-    // Fase 9: cuadrilatero confiable = recorte automatico sin editor (estilo Adobe);
-    // el editor solo abre para detecciones dudosas o fallidas (✂ en Revision re-ajusta).
-    if (!recorteConfiable(esquinas, canvas.width, canvas.height)){
-      esquinas = await abrirEditorEsquinas(canvas, esquinas);
-    }
+    const esquinas = await recortarImportada(canvas);
     window.__captura = { canvas, esquinas };
     procesarYRevisar();
   } catch(e){

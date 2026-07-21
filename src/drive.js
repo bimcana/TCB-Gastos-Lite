@@ -41,6 +41,15 @@ export function porExpirar(margenMs = 5 * 60 * 1000){
   return !!accessToken && Date.now() < expiraEn && (expiraEn - Date.now()) < margenMs;
 }
 
+// UNICA regla de visibilidad del aviso/boton «Reconectar a Drive» (Fase 10). Pura y
+// testeable: la UI se deriva del estado REAL de conexion, nunca de "en que momento se
+// llamo a que" — asi un fallo parcial de postConexion no puede dejar el boton colgado
+// estando conectado (bug que Ari vio en campo). Sin conexion previa no se ofrece
+// reconectar: ese usuario debe conectar desde Ajustes.
+export function debeMostrarReconectar(estaConectado, huboConexionPrevia){
+  return !estaConectado && !!huboConexionPrevia;
+}
+
 let onDesconexion = null;
 export function alDesconectar(cb){ onDesconexion = cb; }
 
@@ -129,6 +138,13 @@ export async function descargarPorId(fileId){
     { headers: { Authorization: 'Bearer ' + accessToken } });
   if (!r.ok) return null;
   return r.blob();
+}
+
+// Mueve un archivo o CARPETA a otro padre sin renombrarlo (usado por «Archivar»).
+export async function moverACarpeta(fileId, nuevoPadreId, viejoPadreId){
+  return api(`files/${fileId}?addParents=${nuevoPadreId}&removeParents=${viejoPadreId}`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({})
+  });
 }
 
 // A la papelera (recuperable 30 dias) — para el original de una factura ajena procesada.

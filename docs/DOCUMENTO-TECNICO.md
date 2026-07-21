@@ -26,9 +26,13 @@ importación en lote desde la fototeca y cola offline. **NO tiene**: Gastos, lec
 Copiados VERBATIM de la Full (si se arregla un bug ahí, re-copiar aquí): `camera, cvready,
 detect, detectia, esquinas, process, enhance, importar, queue, settings, carga, naming,
 config, drive`. Fase 9 (portada 2026-07-21): cámara con enfoque continuo best-effort y
-tolerancia al temblor (`TOL_ESTABLE=0.02` + degradación del conteo `estables`);
-importación con **recorte automático sin editor** cuando `recorteConfiable` (detect.js)
-acepta el cuadrilátero — el editor solo abre para detecciones dudosas. Propios de la Lite: `main.js` (orquestación reducida; la subida es
+tolerancia al temblor (`TOL_ESTABLE=0.02` + degradación del conteo `estables`).
+**Fase 10 (portada 2026-07-21)**: `recortarImportada` con la misma cascada de la Full —
+`detectarDocumento` → `rectanguloDePapel` (minAreaRect) → IA → `bandaDePapel` (laterales
+prolongados al marco de la foto) → editor. Se acepta el primero que pase forma
+(`recorteConfiable`) **y contenido** (`fraccionClara ≥ 0.75`); esta última es la que
+evita aplicar un recorte torcido con fondo dentro. No aplica de la Fase 10: estado
+`validadaPorUsuario` ni botón Reconectar (la Lite no tiene Gastos). Propios de la Lite: `main.js` (orquestación reducida; la subida es
 `subirLite`), `index.html` (2 pestañas: Cámara/Ajustes), `sw.js` (`VERSION 'lite-vN'`,
 runtime-cache solo `vendor/(ort|modelos)`). Vendor: opencv + ort + modelo (~30 MB; SIN
 tesseract/pdf-lib/sheetjs).
