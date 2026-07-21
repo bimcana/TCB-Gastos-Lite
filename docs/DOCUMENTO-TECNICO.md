@@ -49,6 +49,28 @@ tesseract/pdf-lib/sheetjs).
    Client ID). No agregar campos de datos: la Lite no procesa.
 4. Un push por publicación + `.nojekyll` intocable (mismas lecciones de la Full).
 
+## 5b. Rama que publica (verificado 2026-07-21)
+
+La **Lite publica desde `gh-pages`**; la **Full publica desde `main`**. No son iguales —
+no asumir la configuración de una al tocar la otra. Funcionalmente no hay diferencia
+(mismo pipeline, misma URL, misma velocidad); la diferencia es operativa.
+
+**INVARIANTE: empujar siempre las dos ramas al mismo commit** — así la publicación sale
+bien sea cual sea la configuración de cada repo:
+
+```
+git push origin main && git branch -f gh-pages main && git push origin gh-pages
+```
+
+Si un push NO dispara construcción (le pasó a la Full en Fase 8), comprobar antes de
+re-empujar que no haya nada en vuelo:
+`curl -s "https://api.github.com/repos/bimcana/TCB-Gastos-Lite/actions/runs?per_page=3"`
+— sin `queued`/`in_progress`, re-disparar con `git commit --allow-empty` es seguro.
+Verificar el CONTENIDO publicado, no solo el `sw.js`.
+
+Mejora pendiente de Ari: pasar la Lite a `main` (Settings → Pages) y borrar `gh-pages` en
+ambos repos → una sola rama y se acaba el ritual.
+
 ## 5. Publicación (pendiente al escribir esto)
 
 1. Crear repo vacío `bimcana/TCB-Gastos-Lite` en github.com (dueño).
