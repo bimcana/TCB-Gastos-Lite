@@ -49,17 +49,14 @@ tesseract/pdf-lib/sheetjs).
    Client ID). No agregar campos de datos: la Lite no procesa.
 4. Un push por publicación + `.nojekyll` intocable (mismas lecciones de la Full).
 
-## 5b. Rama que publica (verificado 2026-07-21)
+## 5b. Publicación (unificada 2026-07-21)
 
-La **Lite publica desde `gh-pages`**; la **Full publica desde `main`**. No son iguales —
-no asumir la configuración de una al tocar la otra. Funcionalmente no hay diferencia
-(mismo pipeline, misma URL, misma velocidad); la diferencia es operativa.
-
-**INVARIANTE: empujar siempre las dos ramas al mismo commit** — así la publicación sale
-bien sea cual sea la configuración de cada repo:
+**Pages publica desde `main` (root)**, igual que la Full. La Lite publicaba desde
+`gh-pages`; esa rama fue **borrada en ambos repos** — sin paso de compilación, una segunda
+rama solo añadía un ritual de sincronización y confusión. **No volver a crearla.**
 
 ```
-git push origin main && git branch -f gh-pages main && git push origin gh-pages
+git push origin main      # esto es publicar
 ```
 
 Si un push NO dispara construcción (le pasó a la Full en Fase 8), comprobar antes de
@@ -68,18 +65,13 @@ re-empujar que no haya nada en vuelo:
 — sin `queued`/`in_progress`, re-disparar con `git commit --allow-empty` es seguro.
 Verificar el CONTENIDO publicado, no solo el `sw.js`.
 
-Mejora pendiente de Ari: pasar la Lite a `main` (Settings → Pages) y borrar `gh-pages` en
-ambos repos → una sola rama y se acaba el ritual.
+## 5. Puesta en marcha inicial (histórico — YA HECHA, no repetir)
 
-## 5. Publicación (pendiente al escribir esto)
-
-1. Crear repo vacío `bimcana/TCB-Gastos-Lite` en github.com (dueño).
-2. `git remote add origin https://github.com/bimcana/TCB-Gastos-Lite.git`
-   `git push -u origin main && git branch gh-pages main && git push origin gh-pages`
-3. Settings → Pages → Deploy from branch → `gh-pages` / root.
-4. Esperar UNA construcción; verificar:
-   `curl -s https://bimcana.github.io/TCB-Gastos-Lite/sw.js | head -1` → `lite-v1`.
-5. Prueba cruzada: subir una foto desde la Lite y verla «Pendiente de revisión» en la Full.
+El repo `bimcana/TCB-Gastos-Lite` ya existe, está publicado y su Pages apunta a `main`
+(root). **Los pasos originales creaban una rama `gh-pages`: quedaron obsoletos el
+2026-07-21 y NO deben seguirse** — ver §5b. Lo único vigente de esta sección es la prueba
+cruzada de aceptación: subir una foto desde la Lite y verla «Pendiente de revisión» en la
+Full.
 
 ## 6. Pruebas
 
