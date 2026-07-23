@@ -118,12 +118,22 @@ const statusTxt = document.getElementById('cam-status-txt');
 
 // Ajuste "Cámara": con camaraAuto=false la cámara NO se enciende (ni dispara el aviso
 // de permiso de iOS) hasta que el usuario toque el estado en pantalla.
+// Pantalla de camara apagada: logo TCB + descripcion + "Tocar en pantalla…". Al mostrarla
+// se oculta el estado (pill) para no duplicar mensajes; al arrancar se invierte.
+const camIdle = document.getElementById('cam-idle');
+function mostrarIdleCamara(mostrar){
+  camIdle.hidden = !mostrar;
+  document.getElementById('cam-status').style.display = mostrar ? 'none' : '';
+}
+
 function arrancarCamara(){
+  mostrarIdleCamara(false);
   statusTxt.textContent = 'Iniciando cámara…';
   iniciarCamara(video)
     .then(() => { statusTxt.textContent = 'Buscando documento…'; })
     .catch(err => {
       statusTxt.textContent = 'Sin acceso a la cámara';
+      mostrarIdleCamara(true); // volver a la pantalla tocable si el permiso fallo
       toast('Permite el acceso a la cámara para capturar facturas');
       console.error(err);
     });
@@ -131,8 +141,10 @@ function arrancarCamara(){
 if (get('camaraAuto', true)){
   arrancarCamara();
 } else {
-  statusTxt.textContent = 'Toca aquí para activar la cámara';
+  mostrarIdleCamara(true);
 }
+// Tocar la pantalla (o el estado) enciende la camara si esta apagada.
+camIdle.addEventListener('click', arrancarCamara);
 document.getElementById('cam-status').addEventListener('click', () => {
   const track = video.srcObject && video.srcObject.getVideoTracks()[0];
   if (!track || track.readyState === 'ended') arrancarCamara();
@@ -150,11 +162,17 @@ actualizarUICamaraAuto();
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   const track = video.srcObject && video.srcObject.getVideoTracks()[0];
-  if ((!track || track.readyState === 'ended') && get('camaraAuto', true)){
-    iniciarCamara(video).catch(err => {
-      statusTxt.textContent = 'Sin acceso a la cámara';
-      console.error(err);
-    });
+  if (!track || track.readyState === 'ended'){
+    if (get('camaraAuto', true)){
+      mostrarIdleCamara(false);
+      iniciarCamara(video).catch(err => {
+        statusTxt.textContent = 'Sin acceso a la cámara';
+        mostrarIdleCamara(true);
+        console.error(err);
+      });
+    } else {
+      mostrarIdleCamara(true); // "Solo al tocar": volver a la pantalla tocable
+    }
   }
   if (!conectado()) reconectarSilencioso();
 });

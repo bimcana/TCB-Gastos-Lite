@@ -34,7 +34,12 @@ prolongados al marco de la foto) → editor.
 2→35/61, importación auto 31→44/61, cero regresiones): candidatos por contorno
 (approx→minAreaRect→hull) validados uno a uno, rescate hull también en vivo, veto
 `esCasiElEncuadre` en lugar de `tocaBorde`, y `papelLlenaLaFoto`→`marcoCompleto` en la
-cascada de importación. Ver reglas y límites en el doc de la Full (§4.8). Se acepta el primero que pase forma
+cascada de importación. Ver reglas y límites en el doc de la Full (§4.8).
+**Fase 12 (portada 2026-07-21)**: pantalla de cámara «Solo al tocar» con logo TCB +
+descripción + «Tocar en pantalla para activar la cámara» (`#cam-idle`, `mostrarIdleCamara`);
+tocar cualquier parte de la pantalla enciende la cámara. `drive.js` re-copiado de la Full
+(trae `esErrorDePermiso`/`quitarDeCarpeta`, sin uso en Lite — no tiene Gastos). No aplica
+de la Fase 12: detección de duplicado ni borrado (la Lite no lee datos ni gestiona Gastos). Se acepta el primero que pase forma
 (`recorteConfiable`) **y contenido** (`fraccionClara ≥ 0.75`); esta última es la que
 evita aplicar un recorte torcido con fondo dentro. No aplica de la Fase 10: estado
 `validadaPorUsuario` ni botón Reconectar (la Lite no tiene Gastos). Propios de la Lite: `main.js` (orquestación reducida; la subida es
