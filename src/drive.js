@@ -155,6 +155,32 @@ export async function moverAPapelera(fileId){
   });
 }
 
+// true si el error de Drive es de permisos (403 / insufficientFilePermissions). Puro y
+// testeable. Fase 12: distingue el caso "el archivo lo subio otra cuenta" (Lite) para
+// caer al plan B (quitarlo de la carpeta) en vez de fallar el borrado.
+export function esErrorDePermiso(err){
+  const m = (err && err.message) || '';
+  return /\bDrive 403\b/.test(m) || /insufficientFilePermissions/i.test(m);
+}
+
+// Quita el archivo de la carpeta compartida (removeParents) SIN mandarlo a la papelera.
+// El dueño (u organizador) de la carpeta puede sacar un archivo aunque NO sea el dueño
+// del archivo (lo subio otra persona con la Lite): la copia sigue en el Drive de origen,
+// pero desaparece de Gastos. Fase 13: quita de los padres REALES del archivo (no solo la
+// carpeta del mes) para que quede totalmente desvinculado de nuestra vista aunque tenga
+// mas de un padre; si no se pueden leer, usa la carpeta que se pasa.
+export async function quitarDeCarpeta(fileId, carpetaId){
+  let padres = null;
+  try {
+    const r = await api(`files/${fileId}?fields=parents`);
+    if (Array.isArray(r.parents) && r.parents.length) padres = r.parents;
+  } catch(e){ /* sin lectura de padres: se usa carpetaId */ }
+  const quitar = (padres && padres.length ? padres : [carpetaId]).join(',');
+  return api(`files/${fileId}?removeParents=${encodeURIComponent(quitar)}`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({})
+  });
+}
+
 export async function ponerDescripcion(fileId, texto){
   return api(`files/${fileId}`, {
     method: 'PATCH', headers: { 'Content-Type': 'application/json' },
